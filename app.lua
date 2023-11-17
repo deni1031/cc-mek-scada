@@ -1,8 +1,3 @@
-local reactor = peripheral.wrap('fissionReactorLogicAdapter_0') or error('reactor not connected')
-local turbine_1 = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
-local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
-local chat = peripheral.find('chatBox') or error('chat box is not connected')
-
 require('components/turbineCheck')
 require('components/reactorCheck')
 local chatUI = require('components/chatUI')
@@ -31,7 +26,12 @@ function Check(reactor, turbine_1, turbine_2, chat)
 	end
 end
 
-function main(reactor, turbine_1, turbine_2, chat)
+function main()
+	local reactor = peripheral.wrap('fissionReactorLogicAdapter_0') or error('reactor not connected')
+	local turbine_1 = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
+	local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
+	local chat = peripheral.find('chatBox') or error('chat box is not connected')
+
 	while reactor.getStatus() == true do
 
 		turbineCheck(turbine_1, reactor, chat)

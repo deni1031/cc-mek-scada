@@ -196,10 +196,11 @@ local function createReactorStatusMessage(reactor)
 end
 
 -- main function operating power plant and relaying it's status by chat
-return function (chat, turbines, reactor)
-	assert(type(chat) == 'table', 'chat is of incorrect type')
-	assert(type(turbines) == 'table', 'turbines is of incorrect type')
-	assert(type(reactor) == 'table', 'reactor is of incorrect type')
+return function ()
+	local reactor = peripheral.wrap('fissionReactorLogicAdapter_0') or error('reactor not connected')
+	local turbine_1 = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
+	local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
+	local chat = peripheral.find('chatBox') or error('chat box is not connected')
 
 	local configIO = require('configOperations') or error('could not load config file handles',1)
 
