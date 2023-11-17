@@ -5,38 +5,45 @@ local chat = peripheral.find('chatBox') or error('chat box is not connected')
 
 require('components/turbineCheck')
 require('components/reactorCheck')
+local chatUI = require('components/chatUI')
 
-if reactor.getStatus() ~= true then
-	if turbineCheck(turbine_1, reactor, chat) ~= true then
-		io.write('turbine 1 - Failed (not good!)\n')
-	else
-	  io.write('turbine 1 - OK\n')
+function Check(reactor, turbine_1, turbine_2, chat)
+	if reactor.getStatus() ~= true then
+		if turbineCheck(turbine_1, reactor, chat) ~= true then
+			io.write('turbine 1 - Failed (not good!)\n')
+		else
+		  io.write('turbine 1 - OK\n')
+		end
+
+		if turbineCheck(turbine_2, reactor, chat) ~= true then
+			io.write('turbine 2 - Failed (not good!)\n')
+		else
+		  io.write('turbine 2 - OK\n')
+		end
+
+		if reactorCheck(reactor, chat) ~= true then
+			io.write('reactor - Failed (not good!)\n')
+		else
+			io.write('reactor - OK\n')
+		end
+
+		reactor.activate()
 	end
-
-	if turbineCheck(turbine_2, reactor, chat) ~= true then
-		io.write('turbine 2 - Failed (not good!)\n')
-	else
-	  io.write('turbine 2 - OK\n')
-	end
-
-	if reactorCheck(reactor, chat) ~= true then
-		io.write('reactor - Failed (not good!)\n')
-	else
-		io.write('reactor - OK\n')
-	end
-
-	reactor.activate()
 end
 
-while reactor.getStatus() == true do
+function main(reactor, turbine_1, turbine_2, chat)
+	while reactor.getStatus() == true do
 
-	turbineCheck(turbine_1, reactor, chat)
-	turbineCheck(turbine_2, reactor, chat)
+		turbineCheck(turbine_1, reactor, chat)
+		turbineCheck(turbine_2, reactor, chat)
 
-	sleep(8)
+		sleep(8)
 
-	reactorCheck(reactor, chat)
+		reactorCheck(reactor, chat)
 
-	sleep(8)
+		sleep(8)
 
+	end
 end
+
+parrallel.waitForAny(main, chatUI)
