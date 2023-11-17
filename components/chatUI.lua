@@ -202,7 +202,7 @@ return function ()
 	local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
 	local chat = peripheral.find('chatBox') or error('chat box is not connected')
 
-	local configIO = require('configOperations') or error('could not load config file handles',1)
+	local configIO = require('components/configOperations') or error('could not load config file handles',1)
 
 	while chat ~= nil do
 		local event, username, message, uuid, isHidden = os.pullEvent('chat')
