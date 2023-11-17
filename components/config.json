@@ -1,0 +1,9 @@
+{
+	"reactor": {
+		"safeTempLimit":300,
+		"burnRate":0.1
+	},
+	"turbines": {
+
+	}
+}
