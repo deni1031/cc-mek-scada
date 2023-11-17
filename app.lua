@@ -46,4 +46,4 @@ function main(reactor, turbine_1, turbine_2, chat)
 	end
 end
 
-parrallel.waitForAny(main, chatUI)
+parallel.waitForAny(main, chatUI)
