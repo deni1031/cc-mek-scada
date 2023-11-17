@@ -2,7 +2,7 @@ require('components/turbineCheck')
 require('components/reactorCheck')
 local chatUI = require('components/chatUI')
 
-function Check(reactor, turbine_1, turbine_2, chat)
+function check(reactor, turbine_1, turbine_2, chat)
 	if reactor.getStatus() ~= true then
 		if turbineCheck(turbine_1, reactor, chat) ~= true then
 			io.write('turbine 1 - Failed (not good!)\n')
@@ -31,6 +31,8 @@ function main()
 	local turbine_1 = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
 	local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
 	local chat = peripheral.find('chatBox') or error('chat box is not connected')
+
+	check(reactor, turbine_1, turbine_2, chat)
 
 	while reactor.getStatus() == true do
 

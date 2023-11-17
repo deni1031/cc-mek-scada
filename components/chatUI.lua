@@ -198,8 +198,11 @@ end
 -- main function operating power plant and relaying it's status by chat
 return function ()
 	local reactor = peripheral.wrap('fissionReactorLogicAdapter_0') or error('reactor not connected')
-	local turbine_1 = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
-	local turbine_2 = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
+
+	local turbines = {}
+
+	turbines.first = peripheral.wrap('turbineValve_0') or error('first turbine is not connected')
+	turbines.second = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
 	local chat = peripheral.find('chatBox') or error('chat box is not connected')
 
 	local configIO = require('components/configOperations') or error('could not load config file handles',1)
