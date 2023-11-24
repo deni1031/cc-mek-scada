@@ -1,3 +1,9 @@
+-- formats a number with a fixed number of decimal places
+function toFixed(number, decimalPlaces)
+  local formatString = string.format("%%.%df", decimalPlaces)
+  return string.format(formatString, number)
+end
+
 -- get turbine actual status and values of it's production
 local function getStatusTurbine(turbine)
 	local status = {}
@@ -14,14 +20,15 @@ local function getStatusTurbine(turbine)
 		energyRaw < 1000000 and energyRaw / 1000 ..'K' or
 		energyRaw >= 1000000 and energyRaw / 1000000 ..'M'or
 		energyRaw >= 1000000000 and energyRaw / 1000000000 ..'G'
+	status.energy = toFixed(status.energy, 2)
 
-	status.energyCapacity = turbine.getMaxEnergy() / 1000000000
-	status.energyFilledPercentage = turbine.getEnergyFilledPercentage()
+	status.energyCapacity = toFixed(turbine.getMaxEnergy() / 1000000000, 2)
+	status.energyFilledPercentage = toFixed(turbine.getEnergyFilledPercentage(), 2)
 
-	status.productionRate = turbine.getProductionRate()
-	status.maxProduction = turbine.getMaxProduction()
-	status.maxFlowrate = turbine.getMaxFlowrate() / 1000
-	status.maxWaterOutput = turbine.getMaxWaterOutput() / 1000
+	status.productionRate = toFixed(turbine.getProductionRate(), 2)
+	status.maxProduction = toFixed(turbine.getMaxProduction(), 2)
+	status.maxFlowRate = toFixed(turbine.getMaxFlowRate() / 1000, 2)
+	status.maxWaterOutput = toFixed(turbine.getMaxWaterOutput() / 1000, 2)
 
 	return status
 end
@@ -31,34 +38,34 @@ local function getReactorStatus(reactor)
 	local status = {} -- todo change returns
 
 	status.status = reactor.getStatus() == true and 'running' or 'inactive'
-	status.temp = reactor.getTemperature() - 273.15
-	status.damagePercent = reactor.getDamagePercent()
+	status.temp = toFixed(reactor.getTemperature() - 273.15, 2)
+	status.damagePercent = toFixed(reactor.getDamagePercent(), 2)
 
-	status.fuel = reactor.getFuel()
-	status.fuelCapacity = reactor.getFuelCapacity() / 1000
-	status.fuelFilledPercentage = reactor.getFuelFilledPercentage()
+	status.fuel = toFixed(reactor.getFuel(), 2)
+	status.fuelCapacity = toFixed(reactor.getFuelCapacity() / 1000, 2)
+	status.fuelFilledPercentage = toFixed(reactor.getFuelFilledPercentage(), 2)
 
-	status.waste = reactor.getWaste()
-	status.wasteCapacity = reactor.getWasteCapacity() / 1000
-	status.wasteFilledPercentage = reactor.getWasteFilledPercentage()
+	status.waste = toFixed(reactor.getWaste(), 2)
+	status.wasteCapacity = toFixed(reactor.getWasteCapacity() / 1000, 2)
+	status.wasteFilledPercentage = toFixed(reactor.getWasteFilledPercentage(), 2)
 
-	status.burnRate = reactor.getBurnRate()
-	status.actualBurnRate = reactor.getActualBurnRate()
-	status.actualToSetBurnRatePercentage = status.actualBurnRate / status.burnRate * 100 ..'%'
-	status.maxBurnRate = reactor.getMaxBurnRate()
+	status.burnRate = toFixed(reactor.getBurnRate(), 2)
+	status.actualBurnRate = toFixed(reactor.getActualBurnRate(), 2)
+	status.actualToSetBurnRatePercentage = toFixed(status.actualBurnRate / status.burnRate * 100 ..'%', 2)
+	status.maxBurnRate = toFixed(reactor.getMaxBurnRate(), 2)
 
-	status.coolant = reactor.getCoolant()
-	status.coolantCapacity = reactor.getCoolantCapacity() / 1000
-	status.coolantFilledPercentage = reactor.getCoolantFilledPercentage()
+	status.coolant = toFixed(reactor.getCoolant(), 2)
+	status.coolantCapacity = toFixed(reactor.getCoolantCapacity() / 1000, 2)
+	status.coolantFilledPercentage = toFixed(reactor.getCoolantFilledPercentage(), 2)
 
-	status.heatedCoolant = reactor.getHeatedCoolant()
-	status.heatedCoolantCapacity = reactor.getHeatedCoolantCapacity() / 1000
-	status.heatedCoolantFilledPercentage = reactor.getHeatedCoolantFilledPercentage()
+	status.heatedCoolant = toFixed(reactor.getHeatedCoolant(), 2)
+	status.heatedCoolantCapacity = toFixed(reactor.getHeatedCoolantCapacity() / 1000, 2)
+	status.heatedCoolantFilledPercentage = toFixed(reactor.getHeatedCoolantFilledPercentage(), 2)
 
-	status.heatingRate = reactor.getHeatingRate()
-	status.heatCapacity = reactor.getHeatCapacity()
-	status.environmentalLoss = reactor.getEnvironmentalLoss()
-	status.boilEfficiency = reactor.getBoilEfficiency()
+	status.heatingRate = toFixed(reactor.getHeatingRate(), 2)
+	status.heatCapacity = toFixed(reactor.getHeatCapacity(), 2)
+	status.environmentalLoss = toFixed(reactor.getEnvironmentalLoss(), 2)
+	status.boilEfficiency = toFixed(reactor.getBoilEfficiency(), 2)
 	status.isForceDisabled = reactor.isForceDisabled() == 'false' and 'Yes' or 'No'
 
 	return status
@@ -72,6 +79,7 @@ local function amountBasedColor(amount)
       amount > 50 and '#FFFF55' or
       amount <= 50 and '#55FF55'
 end
+
 -- creates message to that will be sent about turbines
 local function createTurbineStatusMessage(turbines)
 	local turbinesStatus = {}
@@ -89,10 +97,13 @@ local function createTurbineStatusMessage(turbines)
 				color = '#5555FF'
 			},
 			{
+				text = '\n'
+			},
+			{
 				text = 'Steam filled: ',
 			},
 			{
-				text = string.format('(%04sB/%04sB (%03s)\n', turbinesStatus[i].steam, turbinesStatus[i].steamCapacity, turbinesStatus[i].steamFilledPercentage..'%'),
+				text = string.format('(%04sB/%04sB (%03s)', turbinesStatus[i].steam.amount, turbinesStatus[i].steamCapacity, turbinesStatus[i].steamFilledPercentage..'%'),
 				color = amountBasedColor(tonumber(turbinesStatus[i].steamFilledPercentage)),
 			},
 			{
@@ -109,7 +120,7 @@ local function createTurbineStatusMessage(turbines)
 				text = string.format('%d/%d', turbinesStatus[i].productionRate, turbinesStatus[i].maxProduction),
 				hoverEvent = {
 					action = 'show_text',
-					value = string.format('Max flowrate: %s\nMax water output: %s', turbinesStatus[i].maxFlowrate, turbinesStatus[i].maxWaterOutput),
+					value = string.format('Max flowrate: %s\nMax water output: %s', turbinesStatus[i].maxFlowRate, turbinesStatus[i].maxWaterOutput),
 				},
 			},
 		})
@@ -210,7 +221,7 @@ return function ()
 
 	while chat ~= nil do
 		local event, username, message, uuid, isHidden = os.pullEvent('chat')
-		local config = config.getFromFile() or error('unable to load configuration',1)
+		local config = configOperations.getFromFile() or error('unable to load configuration',1)
 		if message:find('!turbines') then
 			if message:find('status') then
 				local statusMessage = createTurbineStatusMessage(turbines, chat)
