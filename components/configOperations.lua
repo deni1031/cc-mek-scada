@@ -1,7 +1,7 @@
-local config = {}
+local configOperations = {}
 
 -- sets config directly from the config.json
-function config.getFromFile()
+function configOperations.getFromFile()
   local configFile = io.open('/scada/components/config.json','r')
   local jsonContents = configFile.readAll()
   configFile.close()
@@ -10,8 +10,10 @@ function config.getFromFile()
 end
 
 -- sets config directly to the config.json
-function config.setToFile(configTable)
+function configOperations.setToFile(configTable)
 	local configFile = io.open('/scada/components/config.json','w')
 	configFile.write(textutils.serialiseJSON(configTable))
 	configFile.close()
 end
+
+return configOperations

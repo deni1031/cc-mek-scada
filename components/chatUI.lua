@@ -2,9 +2,11 @@
 local function getStatusTurbine(turbine)
 	local status = {}
 
-	status.steam = turbine.getSteam() / 1000
+	status.steam = turbine.getSteam()
+	status.steam.amount = status.steam.amount / 1000
+
 	status.steamCapacity = turbine.getSteamCapacity() / 1000
-	status.steamFilledPercentage = turbine.getSteamFilledPercentage()..'%'
+	status.steamFilledPercentage = turbine.getSteamFilledPercentage()
 
 	local energyRaw = turbine.getEnergy()
 
@@ -14,7 +16,7 @@ local function getStatusTurbine(turbine)
 		energyRaw >= 1000000000 and energyRaw / 1000000000 ..'G'
 
 	status.energyCapacity = turbine.getMaxEnergy() / 1000000000
-	status.energyFilledPercentage = turbine.getEnergyFilledPercentage()..'%'
+	status.energyFilledPercentage = turbine.getEnergyFilledPercentage()
 
 	status.productionRate = turbine.getProductionRate()
 	status.maxProduction = turbine.getMaxProduction()
@@ -30,15 +32,15 @@ local function getReactorStatus(reactor)
 
 	status.status = reactor.getStatus() == true and 'running' or 'inactive'
 	status.temp = reactor.getTemperature() - 273.15
-	status.damagePercent = reactor.getDamagePercent()..'%'
+	status.damagePercent = reactor.getDamagePercent()
 
 	status.fuel = reactor.getFuel()
 	status.fuelCapacity = reactor.getFuelCapacity() / 1000
-	status.fuelFilledPercentage = reactor.getFuelFilledPercentage()..'%'
+	status.fuelFilledPercentage = reactor.getFuelFilledPercentage()
 
 	status.waste = reactor.getWaste()
 	status.wasteCapacity = reactor.getWasteCapacity() / 1000
-	status.wasteFilledPercentage = reactor.getWasteFilledPercentage()..'%'
+	status.wasteFilledPercentage = reactor.getWasteFilledPercentage()
 
 	status.burnRate = reactor.getBurnRate()
 	status.actualBurnRate = reactor.getActualBurnRate()
@@ -47,11 +49,11 @@ local function getReactorStatus(reactor)
 
 	status.coolant = reactor.getCoolant()
 	status.coolantCapacity = reactor.getCoolantCapacity() / 1000
-	status.coolantFilledPercentage = reactor.getCoolantFilledPercentage()..'%'
+	status.coolantFilledPercentage = reactor.getCoolantFilledPercentage()
 
 	status.heatedCoolant = reactor.getHeatedCoolant()
 	status.heatedCoolantCapacity = reactor.getHeatedCoolantCapacity() / 1000
-	status.heatedCoolantFilledPercentage = reactor.getHeatedCoolantFilledPercentage()..'%'
+	status.heatedCoolantFilledPercentage = reactor.getHeatedCoolantFilledPercentage()
 
 	status.heatingRate = reactor.getHeatingRate()
 	status.heatCapacity = reactor.getHeatCapacity()
@@ -62,15 +64,14 @@ local function getReactorStatus(reactor)
 	return status
 end
 
--- get color based on percentage in input
+-- get color based on Percentage in input
 local function amountBasedColor(amount)
-	return 
-		amount >= 80 and '#AA0000' or
-		amount >= 75 and '#FFAA00' or
-		amount >= 60 and '#FFFF55' or
-		amount <= 50 and '#55FF55'
+  return amount >= 80 and '#AA0000' or
+      amount >= 75 and '#FFAA00' or
+      amount >= 60 and '#FFFF55' or
+      amount > 50 and '#FFFF55' or
+      amount <= 50 and '#55FF55'
 end
-
 -- creates message to that will be sent about turbines
 local function createTurbineStatusMessage(turbines)
 	local turbinesStatus = {}
@@ -91,15 +92,15 @@ local function createTurbineStatusMessage(turbines)
 				text = 'Steam filled: ',
 			},
 			{
-				text = string.format('(%04sB/%04sB (%03s)\n', turbinesStatus[i].steam, turbinesStatus[i].steamCapacity, turbinesStatus[i].steamFilledPercentage),
-				color = amountBasedColor(tonumber(turbinesStatus[i].steamFilledPercentage:sub(1,-2))),
+				text = string.format('(%04sB/%04sB (%03s)\n', turbinesStatus[i].steam, turbinesStatus[i].steamCapacity, turbinesStatus[i].steamFilledPercentage..'%'),
+				color = amountBasedColor(tonumber(turbinesStatus[i].steamFilledPercentage)),
 			},
 			{
 				text = 'Energy gathered: ',
 			},
 			{
-				text = string.format('%sFE/%sFE (%03s)\n', turbinesStatus[i].energy, turbinesStatus[i].energyCapacity, turbinesStatus[i].energyFilledPercentage),
-				color = amountBasedColor(tonumber(turbinesStatus[i].energyFilledPercentage:sub(1,-2)))
+				text = string.format('%sFE/%sFE (%03s)\n', turbinesStatus[i].energy, turbinesStatus[i].energyCapacity, turbinesStatus[i].energyFilledPercentage..'%'),
+				color = amountBasedColor(tonumber(turbinesStatus[i].energyFilledPercentage))
 			},
 			{
 				text = 'Production rate: ',
@@ -143,36 +144,36 @@ local function createReactorStatusMessage(reactor)
 			text = 'Damage: '
 		},
 		{
-			text = string.format('%03s\n', status.damagePercent),
-			color = amountBasedColor(tonumber(status.damagePercent:sub(1,-2))),
+			text = string.format('%03s\n', status.damagePercent..'%'),
+			color = amountBasedColor(tonumber(status.damagePercent)),
 		},
 		{
 			text = 'Fuel: '
 		},
 		{
-			text = string.format('%fB/%fB (%s)\n', status.fuel.amount / 1000, status.fuelCapacity, status.fuelFilledPercentage),
-			color = amountBasedColor(tonumber(status.fuelFilledPercentage:sub(1,-2)))
+			text = string.format('%fB/%fB (%s)\n', status.fuel.amount / 1000, status.fuelCapacity, status.fuelFilledPercentage..'%'),
+			color = amountBasedColor(tonumber(status.fuelFilledPercentage))
 		},
 		{
 			text = 'Waste: '
 		},
 		{
-			text = string.format('%fB/%fB (%s)\n', status.waste.amount / 1000, status.wasteCapacity, status.wasteFilledPercentage),
-			color = amountBasedColor(tonumber(status.wasteFilledPercentage:sub(1,-2)))
+			text = string.format('%fB/%fB (%s)\n', status.waste.amount / 1000, status.wasteCapacity, status.wasteFilledPercentage..'%'),
+			color = amountBasedColor(tonumber(status.wasteFilledPercentage))
 		},
 		{
 			text = 'Coolant: '
 		},
 		{
-			text = string.format('%fB/%fB (%s)\n', status.coolant.amount / 1000, status.coolantCapacity, status.coolantFilledPercentage),
-			color = amountBasedColor(tonumber(status.coolantFilledPercentage:sub(1,-2)))
+			text = string.format('%fB/%fB (%s)\n', status.coolant.amount / 1000, status.coolantCapacity, status.coolantFilledPercentage..'%'),
+			color = amountBasedColor(tonumber(status.coolantFilledPercentage))
 		},
 		{
 			text = 'Heated coolant: '
 		},
 		{
-			text = string.format('%fB/%fB (%s)\n', status.heatedCoolant.amount / 1000, status.heatedCoolantCapacity, status.heatedCoolantFilledPercentage),
-			color = amountBasedColor(tonumber(status.heatedCoolantFilledPercentage:sub(1,-2)))
+			text = string.format('%fB/%fB (%s)\n', status.heatedCoolant.amount / 1000, status.heatedCoolantCapacity, status.heatedCoolantFilledPercentage..'%'),
+			color = amountBasedColor(tonumber(status.heatedCoolantFilledPercentage))
 		},
 		{
 			text = 'Burn rate:' 
@@ -181,7 +182,7 @@ local function createReactorStatusMessage(reactor)
 			text = string.format('%fmB/%fmB\n', status.burnRate, status.maxBurnRate),
 			hoverEvent = {
 				action = 'show_text',
-				value = string.format('Actual to set burn rate: %f/%f (%s)', status.burnRate, status.actualBurnRate, status.actualToSetBurnRatePercentage)
+				value = string.format('Actual to set burn rate: %f/%f (%s)', status.burnRate, status.actualBurnRate, status.actualToSetBurnRatePercentage..'%')
 			},
 		},
 		{
@@ -205,11 +206,11 @@ return function ()
 	turbines.second = peripheral.wrap('turbineValve_1') or error('second turbine is not connected')
 	local chat = peripheral.find('chatBox') or error('chat box is not connected')
 
-	local configIO = require('components/configOperations') or error('could not load config file handles',1)
+	require('components/configOperations')
 
 	while chat ~= nil do
 		local event, username, message, uuid, isHidden = os.pullEvent('chat')
-		local config = configIO.getFromFile() or error('unable to load configuration',1)
+		local config = config.getFromFile() or error('unable to load configuration',1)
 		if message:find('!turbines') then
 			if message:find('status') then
 				local statusMessage = createTurbineStatusMessage(turbines, chat)
